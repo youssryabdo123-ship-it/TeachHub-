@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeachHub | منصة المعلم وأولياء الأمور</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* هنا كل CSS الموجود في ملفك السابق، مع بعض تعديلات صغيرة للlogin modal */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:#f4f7fc;color:#1e2a3e;direction:rtl;padding:20px 16px 40px;}
+.app-container{max-width:1280px;margin:0 auto;}
+.main-header{background:linear-gradient(135deg,#1e3c72 0%,#2b4c7c 100%);border-radius:28px;padding:20px 24px;margin-bottom:28px;box-shadow:0 12px 20px -10px rgba(0,0,0,0.15);color:white;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;}
+.header-brand h1{font-size:1.8rem;font-weight:800;display:flex;align-items:center;gap:10px;}
+.header-brand h1 i{font-size:2rem;color:#ffd966;}
+.teacher-badge{background:rgba(255,255,255,0.2);backdrop-filter:blur(4px);padding:8px 20px;border-radius:40px;font-size:1.1rem;font-weight:600;display:inline-flex;align-items:center;gap:8px;}
+.teacher-badge i{font-size:1.3rem;}
+.role-switch{display:flex;gap:12px;background:#fff;padding:5px;border-radius:60px;box-shadow:0 4px 12px rgba(0,0,0,0.05);}
+.role-btn{border:none;background:transparent;padding:10px 24px;font-weight:700;font-size:1rem;border-radius:40px;cursor:pointer;transition:all 0.2s ease;color:#2c3e66;}
+.role-btn.active{background:#1e3c72;color:white;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;margin-bottom:32px;}
+.card{background:white;border-radius:28px;box-shadow:0 10px 20px rgba(0,0,0,0.03),0 6px 6px rgba(0,0,0,0.05);overflow:hidden;transition:all 0.2s;border:1px solid #e9eef3;}
+.card-header{padding:18px 22px;background:#ffffff;border-bottom:2px solid #eef2f8;display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.2rem;color:#1f3b62;}
+.card-header i{font-size:1.5rem;color:#2b5e8f;}
+.card-body{padding:18px 22px;}
+.student-table, .attendance-table, .grades-table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+.student-table th, .attendance-table th, .grades-table th{text-align:right;padding:10px 5px;color:#4a627a;font-weight:600;border-bottom:1px solid #e2e8f0;}
+.student-table td, .attendance-table td, .grades-table td{padding:10px 5px;border-bottom:1px solid #f0f2f5;vertical-align:middle;}
+.badge{padding:4px 12px;border-radius:30px;font-size:0.7rem;font-weight:700;display:inline-block;}
+.badge.present{background:#dff9e6;color:#1e7b48;}
+.badge.absent{background:#ffe6e5;color:#c23d2e;}
+.rating-badge{font-size:0.75rem;padding:4px 10px;border-radius:20px;}
+.committed{background:#e0f2fe;color:#0369a1;}
+.average{background:#fff3e3;color:#b45309;}
+.weak{background:#ffe4e2;color:#b91c1c;}
+.progress-bar-bg{background:#e9ecef;border-radius:20px;height:8px;width:100%;overflow:hidden;}
+.progress-fill{background:#2b5e8f;width:0%;height:8px;border-radius:20px;}
+.btn-sm{background:#eef2fa;border:none;padding:6px 12px;border-radius:30px;font-size:0.7rem;font-weight:600;cursor:pointer;transition:0.1s;}
+.btn-primary-sm{background:#1e3c72;color:white;}
+.flex-between{display:flex;justify-content:space-between;align-items:center;}
+.notification-chip{background:#fef9e3;border-radius:30px;padding:12px 16px;margin-top:12px;font-size:0.8rem;border-right:4px solid #f1b04a;}
+.subscription-status{font-weight:700;}
+.paid{color:#2b8c4a;}
+.unpaid{color:#c23d2e;}
+hr{margin:16px 0;border-color:#edf2f7;}
+@media(max-width:680px){body{padding:14px 12px;}.card-header{padding:14px 18px;font-size:1rem;}.card-body{padding:14px 16px;}.role-btn{padding:6px 16px;font-size:0.85rem;}}
+.empty-msg{text-align:center;color:#7e8b9c;padding:20px;}
+.inline-icon{margin-left:6px;}
+footer{text-align:center;margin-top:35px;font-size:0.75rem;color:#6c7a8e;}
+/* LOGIN modal */
+#loginModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;z-index:9999;}
+#loginModal div{background:white;border-radius:16px;padding:32px;width:320px;text-align:center;}
+#loginModal input, #loginModal select{width:100%;padding:8px;margin:8px 0;}
+#loginModal button{margin-top:12px;padding:10px 20px;background:#1e3c72;color:white;border:none;border-radius:8px;cursor:pointer;}
+#loginError{color:red;margin-top:10px;display:none;}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+<!-- LOGIN -->
+<div id="loginModal">
+    <div>
+        <h2>تسجيل الدخول</h2>
+        <select id="roleSelect">
+            <option value="teacher">المعلم</option>
+            <option value="parent">ولي الأمر</option>
+        </select>
+        <input type="text" id="userInput" placeholder="اسم المستخدم أو رقم ولي الأمر">
+        <input type="password" id="passwordInput" placeholder="كلمة المرور">
+        <button id="loginBtn">تسجيل الدخول</button>
+        <p id="loginError">بيانات غير صحيحة!</p>
+    </div>
+</div>
+
+<!-- هنا تبقى كل محتويات index.html الأصلية: main-header + teacherPanel + parentPanel + footer -->
+<!-- انسخ الكود اللي عندك للـteacherPanel والـparentPanel كما هو -->
+
+</div>
+
+<script>
+// ---------- بيانات الطلاب ----------
+let students = [
+    { id:1, name:"أحمد السيد", parentPhone:"01001234567", group:"الصف الخامس أ", subscription:"paid", attendance:{}, grades:{exam:88, homework:85, monthly:90}, rating:"committed" },
+    { id:2, name:"ليلى محمد", parentPhone:"01112345678", group:"الصف الخامس أ", subscription:"unpaid", attendance:{}, grades:{exam:65, homework:70, monthly:68}, rating:"average" }
+];
+let notificationsGlobal = [];
+
+// ---------- تسجيل دخول ----------
+const teacherUser = { username:"mohamedysr", password:"123456" };
+const parentUsers = students.map(s => ({ phone:s.parentPhone, password:"1111", studentId:s.id }));
+let currentParentStudentId = null;
+
+document.getElementById("loginBtn").addEventListener("click", function(){
+    const role = document.getElementById("roleSelect").value;
+    const userVal = document.getElementById("userInput").value.trim();
+    const passVal = document.getElementById("passwordInput").value.trim();
+    let success = false;
+
+    if(role === "teacher" && userVal === teacherUser.username && passVal === teacherUser.password) {
+        success = true;
+        document.getElementById("teacherPanel").style.display = "block";
+        document.getElementById("parentPanel").style.display = "none";
+    } else if(role === "parent") {
+        const parent = parentUsers.find(p => p.phone===userVal && p.password===passVal);
+        if(parent){
+            success = true;
+            currentParentStudentId = parent.studentId;
+            renderParentUI(currentParentStudentId);
+            document.getElementById("teacherPanel").style.display = "none";
+            document.getElementById("parentPanel").style.display = "block";
+        }
+    }
+
+    if(success){ document.getElementById("loginModal").style.display="none"; initAttendanceForAll(); renderTeacherUI(); }
+    else { document.getElementById("loginError").style.display="block"; }
+});
+
+// ---------- هنا تبقى كل الـJS اللي عندك للمعلم + ولي الأمر ----------
+// تشمل renderTeacherUI, renderParentUI, addStudent, markAllPresent, updateDemoGrades, sendNotificationToParent ...
+</script>
+
+</body>
+</html>
